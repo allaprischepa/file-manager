@@ -4,6 +4,7 @@ import { stdin  } from 'node:process';
 import { cd, ls, up } from './src/nwd/nwd.js';
 import { handleError, InvalidInputError } from './src/error/erorr.js';
 import { log } from './src/utils/utils.js';
+import { os } from './src/os/os.js';
 
 let currentDir = homedir();
 const displayCurrentDir = () => log.magenta(`You are currently in ${currentDir}`);
@@ -31,7 +32,13 @@ stdin.on('data', async (input) => {
       }
       case 'ls': {
         const res = await ls(currentDir, args);
-        console.table(res);
+        if (res) console.table(res);
+        break;
+      }
+      case 'os': {
+        const { res, table } = os(args);
+        if (res) console.log(res);
+        if (table) console.table(table);
         break;
       }
       default: {
