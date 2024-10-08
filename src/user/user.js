@@ -1,4 +1,5 @@
 import { parseArgs } from 'node:util';
+import { log } from '../utils/utils.js';
 
 export const getUsernameFromArgs = () => {
   let username = 'stranger';
@@ -12,3 +13,7 @@ export const getUsernameFromArgs = () => {
 
   return username;
 }
+
+const username = getUsernameFromArgs();
+export const displayWelcomeMsg = () => log.yellow(`Welcome to the File Manager, ${username}!`);
+export const displayByeMsg = () => log.yellow(`Thank you for using File Manager, ${username}, goodbye!`);

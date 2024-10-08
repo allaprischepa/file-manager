@@ -1,13 +1,12 @@
 import { homedir } from 'node:os';
-import { getUsernameFromArgs } from './src/user/user.js';
+import { displayWelcomeMsg, displayByeMsg } from './src/user/user.js';
 import { stdin  } from 'node:process';
-import { cd, ls } from './src/nwd/nwd.js';
+import { cd, ls, up } from './src/nwd/nwd.js';
+import { handleError, InvalidInputError } from './src/error/erorr.js';
+import { log } from './src/utils/utils.js';
 
-const username = getUsernameFromArgs();
 let currentDir = homedir();
-const displayWelcomeMsg = () => console.log('\x1b[36m%s\x1b[0m', `Welcome to the File Manager, ${username}!`);
-const displayCurrentDir = () => console.log('You are currently in \x1b[34m%s\x1b[0m', currentDir);
-const displayByeMsg = () => console.log('\x1b[36m%s\x1b[0m', `Thank you for using File Manager, ${username}, goodbye!`)
+const displayCurrentDir = () => log.magenta(`You are currently in ${currentDir}`);
 
 displayWelcomeMsg();
 displayCurrentDir();
@@ -20,22 +19,27 @@ stdin.on('data', async (input) => {
 
   try {
     switch(op) {
+      case 'up': {
+        const res = await up(currentDir, args);
+        if (res) currentDir = res;
+        break;
+      }
       case 'cd': {
         const res = await cd(currentDir, args);
-        currentDir = res;
+        if (res) currentDir = res;
         break;
       }
       case 'ls': {
-        const res = await ls(currentDir);
+        const res = await ls(currentDir, args);
         console.table(res);
         break;
       }
       default: {
-        console.log('Unknown operation');
+        throw new InvalidInputError('Unknown operation');
       }
     }
   } catch(err) {
-    console.log('\x1b[31m%s\x1b[0m', `Invalid input. Error: ${err.message}`);
+    handleError(err);
   }
 
   displayCurrentDir();
@@ -51,6 +55,6 @@ process.on('exit', code => {
   if (code === 0) {
     displayByeMsg();
   } else {
-    console.log(`Something went wrong. Error code: ${code}`);
+    log.red(`Something went wrong. Error code: ${code}`);
   }
 });
