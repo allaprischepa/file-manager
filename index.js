@@ -1,6 +1,6 @@
 import { homedir } from 'node:os';
 import { displayWelcomeMsg, displayByeMsg } from './src/user/user.js';
-import { stdin  } from 'node:process';
+import { stdin } from 'node:process';
 import { cd, ls, up } from './src/nwd/nwd.js';
 import { handleError, InvalidInputError } from './src/error/erorr.js';
 import { log } from './src/utils/utils.js';
@@ -57,7 +57,7 @@ stdin.on('data', async (input) => {
         break;
       }
       default: {
-        throw new InvalidInputError('Unknown operation');
+        throw new InvalidInputError(`Unknown operation: ${op}`);
       }
     }
   } catch(err) {
