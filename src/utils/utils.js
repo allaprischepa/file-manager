@@ -1,4 +1,5 @@
 import * as fs from 'node:fs/promises';
+import { InvalidInputError } from '../error/erorr.js';
 
 const reset = "\x1b[0m";
 
@@ -22,4 +23,27 @@ export async function checkIsDirectory(pathToDir) {
   const stats = await fs.stat(pathToDir);
 
   if (!stats.isDirectory()) throw Error(`The path '${pathToDir}' is not a folder`);
+}
+
+function isValidFilename(fileName) {
+  const filenameReservedRegex = /[<>:"/\\|?*\u0000-\u001F]/g;
+  const windowsReservedNameRegex = /^(con|prn|aux|nul|com\d|lpt\d)$/i;
+
+	if (!fileName || fileName.length > 255) {
+		return false;
+	}
+
+	if (filenameReservedRegex.test(fileName) || windowsReservedNameRegex.test(fileName)) {
+		return false;
+	}
+
+	if (fileName === '.' || fileName === '..') {
+		return false;
+	}
+
+	return true;
+}
+
+export function checkIsValidFilename(fileName) {
+  if (!isValidFilename(fileName)) throw new InvalidInputError(`The filename ${fileName} is not valid`);
 }
