@@ -1,4 +1,4 @@
-import { checkArguments } from "../error/erorr.js";
+import { checkArguments, checkOutOfHomePath } from "../error/erorr.js";
 import { createBrotliCompress, createBrotliDecompress } from 'node:zlib';
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
@@ -10,6 +10,9 @@ export async function compress(currentDir, args, reverse = false) {
 
   const sourcePath = path.resolve(currentDir, args[0]);
   const destPath = path.resolve(currentDir, args[1]);
+
+  checkOutOfHomePath(sourcePath);
+  checkOutOfHomePath(destPath);
 
   await checkIsFile(sourcePath);
 
