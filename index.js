@@ -6,6 +6,7 @@ import { handleError, InvalidInputError } from './src/error/erorr.js';
 import { log } from './src/utils/utils.js';
 import { os } from './src/os/os.js';
 import { hash } from './src/hash/hash.js';
+import { compress, decompress } from './src/zip/zip.js';
 
 let currentDir = homedir();
 const displayCurrentDir = () => log.magenta(`You are currently in ${currentDir}`);
@@ -45,6 +46,14 @@ stdin.on('data', async (input) => {
       case 'hash': {
         const res = await hash(currentDir, args);
         if (res) console.log(res);
+        break;
+      }
+      case 'compress': {
+        await compress(currentDir, args);
+        break;
+      }
+      case 'decompress': {
+        await decompress(currentDir, args);
         break;
       }
       default: {
