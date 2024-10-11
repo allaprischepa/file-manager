@@ -34,7 +34,9 @@ export async function add(currentDir, args) {
 
   const filePath = path.join(currentDir, newFileName);
 
-  await fs.writeFile(filePath, '');
+  await fs.writeFile(filePath, '', { flag: 'wx' });
+
+  return { res: `The file ${filePath} is added`};
 }
 
 export async function rn(currentDir, args) {
@@ -50,7 +52,15 @@ export async function rn(currentDir, args) {
 
   const newPath = path.join(path.dirname(oldPath), newFileName);
 
+  const oldPathAccess = await fs.access(oldPath, fs.constants.F_OK).catch((err) => { return err });
+  const newPathAccess = await fs.access(newPath, fs.constants.F_OK).catch((err) => { return err });
+
+  if (oldPathAccess instanceof Error) throw oldPathAccess;
+  if (!(newPathAccess instanceof Error)) throw Error(`File ${newPath} already exists`);
+
   await fs.rename(oldPath, newPath);
+
+  return { res: `The file ${oldPath} is renamed into ${newFileName}` };
 }
 
 export async function rm(currentDir, args) {
@@ -61,4 +71,6 @@ export async function rm(currentDir, args) {
   await checkIsFile(filePath);
 
   await fs.unlink(filePath);
+
+  return { res: `The file ${filePath} is removed `};
 }

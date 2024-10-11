@@ -21,61 +21,29 @@ stdin.on('data', async (input) => {
 
   if (op === '.exit') process.exit(0);
 
+  const ops = {
+    'up': () => up(currentDir, args),
+    'cd': () => cd(currentDir, args),
+    'ls': () => ls(currentDir, args),
+    'cat': () => cat(currentDir, args),
+    'add': () => add(currentDir, args),
+    'rn': () => rn(currentDir, args),
+    'rm': () => rm(currentDir, args),
+    'os': () =>  os(args),
+    'hash': () => hash(currentDir, args),
+    'compress': () => compress(currentDir, args),
+    'decompress': () => decompress(currentDir, args),
+  }
+
   try {
-    switch(op) {
-      case 'up': {
-        const res = await up(currentDir, args);
-        if (res) currentDir = res;
-        break;
-      }
-      case 'cd': {
-        const res = await cd(currentDir, args);
-        if (res) currentDir = res;
-        break;
-      }
-      case 'ls': {
-        const res = await ls(currentDir, args);
-        if (res) console.table(res);
-        break;
-      }
-      case 'cat': {
-        await cat(currentDir, args);
-        break;
-      }
-      case 'add': {
-        await add(currentDir, args);
-        break;
-      }
-      case 'rn': {
-        await rn(currentDir, args);
-        break;
-      }
-      case 'rm': {
-        await rm(currentDir, args);
-        break;
-      }
-      case 'os': {
-        const { res, table } = os(args);
-        if (res) console.log(res);
-        if (table) console.table(table);
-        break;
-      }
-      case 'hash': {
-        const res = await hash(currentDir, args);
-        if (res) console.log(res);
-        break;
-      }
-      case 'compress': {
-        await compress(currentDir, args);
-        break;
-      }
-      case 'decompress': {
-        await decompress(currentDir, args);
-        break;
-      }
-      default: {
-        throw new InvalidInputError(`Unknown operation: ${op}`);
-      }
+    if (op in ops) {
+      const { newDir, res, table } = await ops[op]() || {};
+
+      if (newDir) currentDir = newDir;
+      if (res) console.log(res);
+      if (table) console.table(table);
+    } else {
+      throw new InvalidInputError(`Unknown operation: ${op}`);
     }
   } catch(err) {
     handleError(err);

@@ -4,6 +4,7 @@ import * as fs from 'node:fs/promises';
 import path from 'node:path';
 import { createReadStream, createWriteStream } from "node:fs";
 import { checkIsFile } from "../utils/utils.js";
+import { pipeline } from "node:stream/promises";
 
 export async function compress(currentDir, args, reverse = false) {
   checkArguments(args, [{ name: 'path_to_file' }, { name: 'path_to_destination' }]);
@@ -21,12 +22,14 @@ export async function compress(currentDir, args, reverse = false) {
   await fs.mkdir(dirPath, { recursive: true });
 
   const source = createReadStream(sourcePath);
-  const destination = createWriteStream(destPath);
+  const destination = createWriteStream(destPath, { flags: 'wx'});
   const brotli = reverse ? createBrotliDecompress() : createBrotliCompress();
 
-  source.pipe(brotli).pipe(destination);
+  await pipeline(source, brotli, destination);
+
+  return { res: `The file ${sourcePath} is ${reverse ? 'de' : ''}compressed into ${destPath}`};
 }
 
 export async function decompress(currentDir, args) {
-  await compress(currentDir, args, true);
+  return compress(currentDir, args, true);
 }

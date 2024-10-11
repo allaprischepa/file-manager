@@ -17,5 +17,5 @@ export async function hash(currentDir, args) {
   const rStream = createReadStream(pathToFile);
   const res = rStream.pipe(hash).digest('hex');
 
-  return res;
+  return { res: res };
 }

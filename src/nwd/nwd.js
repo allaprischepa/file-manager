@@ -29,7 +29,7 @@ export async function ls(directory, args) {
     ...files.map((file) => { return { name: file, type: 'file' } }),
   ];
 
-  return result;
+  return { table: result };
 }
 
 export async function cd(currentDir, args) {
@@ -41,7 +41,7 @@ export async function cd(currentDir, args) {
 
   await checkIsDirectory(pathToDir);
 
-  return pathToDir;
+  return { newDir: pathToDir };
 }
 
 export async function up(currentDir, args) {
