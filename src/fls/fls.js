@@ -45,6 +45,8 @@ export async function rn(currentDir, args) {
 
   const oldPath = path.resolve(currentDir, args[0]);
 
+  checkOutOfHomePath(oldPath);
+
   await checkIsFile(oldPath);
 
   const newFileName = args[1];
@@ -69,6 +71,8 @@ export async function rm(currentDir, args) {
 
   const filePath = path.resolve(currentDir, args[0]);
 
+  checkOutOfHomePath(filePath);
+
   await checkIsFile(filePath);
 
   await fs.unlink(filePath);
@@ -81,10 +85,14 @@ export async function cp(currentDir, args, removeSource = false) {
 
   const sourcePath = path.resolve(currentDir, args[0]);
 
+  checkOutOfHomePath(sourcePath);
+
   await checkIsFile(sourcePath);
 
   const newFileName = path.basename(sourcePath);
   const destPath = path.resolve(currentDir, args[1], newFileName);
+
+  checkOutOfHomePath(destPath);
 
   // If destination contains not existing folders
   const dirPath = path.dirname(destPath);
@@ -99,7 +107,7 @@ export async function cp(currentDir, args, removeSource = false) {
     await fs.unlink(sourcePath);
   }
 
-  return { res: `The file ${sourcePath} is ${removeSource ? 'moved' : 'copied'} to ${path.dirname(destPath)}` };
+  return { res: `The file ${sourcePath} is ${removeSource ? 'moved' : 'copied'} to ${dirPath}` };
 }
 
 export async function mv(currentDir, args) {
