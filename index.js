@@ -7,7 +7,7 @@ import { log } from './src/utils/utils.js';
 import { os } from './src/os/os.js';
 import { hash } from './src/hash/hash.js';
 import { compress, decompress } from './src/zip/zip.js';
-import { add, cat, rm, rn } from './src/fls/fls.js';
+import { add, cat, cp, mv, rm, rn } from './src/fls/fls.js';
 
 let currentDir = homedir();
 const displayCurrentDir = () => log.magenta(`You are currently in ${currentDir}`);
@@ -28,6 +28,8 @@ stdin.on('data', async (input) => {
     'cat': () => cat(currentDir, args),
     'add': () => add(currentDir, args),
     'rn': () => rn(currentDir, args),
+    'cp': () => cp(currentDir, args),
+    'mv': () => mv(currentDir, args),
     'rm': () => rm(currentDir, args),
     'os': () =>  os(args),
     'hash': () => hash(currentDir, args),

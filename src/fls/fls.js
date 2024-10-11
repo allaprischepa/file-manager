@@ -1,9 +1,10 @@
 import { stdout } from 'node:process';
 import { checkArguments, checkOutOfHomePath } from '../error/erorr.js';
 import { checkIsFile, checkIsValidFilename } from '../utils/utils.js';
-import { createReadStream } from 'node:fs';
+import { createReadStream, createWriteStream } from 'node:fs';
 import path from 'node:path';
 import * as fs from 'fs/promises';
+import { pipeline } from 'node:stream/promises';
 
 export async function cat(currentDir, args) {
   checkArguments(args, [{ name: 'path_to_file' }]);
@@ -73,4 +74,34 @@ export async function rm(currentDir, args) {
   await fs.unlink(filePath);
 
   return { res: `The file ${filePath} is removed `};
+}
+
+export async function cp(currentDir, args, removeSource = false) {
+  checkArguments(args, [{ name: 'path_to_file'}, { name: 'path_to_new_directory' }]);
+
+  const sourcePath = path.resolve(currentDir, args[0]);
+
+  await checkIsFile(sourcePath);
+
+  const newFileName = path.basename(sourcePath);
+  const destPath = path.resolve(currentDir, args[1], newFileName);
+
+  // If destination contains not existing folders
+  const dirPath = path.dirname(destPath);
+  await fs.mkdir(dirPath, { recursive: true });
+
+  const source = createReadStream(sourcePath);
+  const destination = createWriteStream(destPath, { flags: 'wx'});
+
+  await pipeline(source, destination);
+
+  if (removeSource) {
+    await fs.unlink(sourcePath);
+  }
+
+  return { res: `The file ${sourcePath} is ${removeSource ? 'moved' : 'copied'} to ${path.dirname(destPath)}` };
+}
+
+export async function mv(currentDir, args) {
+  return cp(currentDir, args, true);
 }
