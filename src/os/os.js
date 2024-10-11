@@ -17,7 +17,7 @@ function cpus() {
 
 export function os(args) {
   const osOperation = {
-    '--EOL': { res: nOs.EOL },
+    '--EOL': { res: JSON.stringify(nOs.EOL) },
     '--cpus': cpus(),
     '--homedir': { res: nOs.homedir() },
     '--username': { res: nOs.userInfo().username },
