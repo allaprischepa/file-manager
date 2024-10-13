@@ -17,7 +17,7 @@ displayCurrentDir();
 
 stdin.setEncoding('utf-8');
 stdin.on('data', async (input) => {
-  const [op, ...args] = input.trim().split(' ');
+  const [op, ...args] = input.trim().split(/\s+/);
 
   if (op === '.exit') process.exit(0);
 
