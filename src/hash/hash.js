@@ -15,7 +15,10 @@ export async function hash(currentDir, args) {
 
   const hash = createHash('sha256');
   const rStream = createReadStream(pathToFile);
-  const res = rStream.pipe(hash).digest('hex');
 
-  return { res: res };
+  return new Promise((resolve, reject) => {
+    rStream.pipe(hash)
+      .on('finish', () => resolve({ res: hash.digest('hex')}))
+      .on('erorr', (err) => reject(err));
+  });
 }
